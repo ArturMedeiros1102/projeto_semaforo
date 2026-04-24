@@ -2,18 +2,13 @@
 #include <Arduino.h>
 #include "WiFiManager.h"
 
-
-
-
-
-
-void setup() 
+void setup()
 {
   Serial.begin(9600);
   conectarWiFi();
 }
 
-void loop() 
+void loop()
 {
   garantirWiFiConectado();
 }
