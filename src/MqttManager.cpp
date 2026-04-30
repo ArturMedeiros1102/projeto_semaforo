@@ -4,6 +4,7 @@
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 
+//TODO: TALVEZ PRECISE .CPP DO SCRETS   
 #include "secrets.h"
 #include "WiFiManager.h"
 #include "MqttManager.h"
@@ -97,7 +98,7 @@ void configurarMQTT()
     debugInfo("Callback interno do MQTT configurado.");
 }
 
-void conectaMQTT()
+void conectarMQTT()
 {
     if (!wifiEstaConectado())
     {

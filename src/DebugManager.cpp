@@ -64,3 +64,5 @@ void configurarDebug()
         debugInfo(" Debug iniciado em modo completo");
     debugInfo("====================");
 }
+
+//TODO: CRIAR A FUNÇÃO OBTERNIVELDEBUGATUAL

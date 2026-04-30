@@ -8,12 +8,14 @@ void conectarMQTT();
 void garantirMQTTConectado();
 void loopMQTT();
 
-void publicarMensagem(const char *topico, const char *mensagem);
 
 bool mqttEstaConectado();
 
-const char* obterTopicoPublicacao();
-const char* obterTopicoRecebimento();
+void publicarMensagem(const char *topico, const char *mensagem);
+void publicarMensagemNoTopico(int indiceTopico, const char *mensagem);
+
+const char* obterTopicoPublicacao(int indiceTopico);
+const char* obterTopicoRecebimento(int indiceTopico);
 
 typedef void (*CallbackMensagemMQTT)(const char *topico, const String &mensagem);
 

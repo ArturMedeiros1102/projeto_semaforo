@@ -19,5 +19,4 @@ void debugInfoSemLinha(const String &mensagem);
 
 int obterNivelDebugAtual();
 
-
 #endif
