@@ -33,13 +33,14 @@ void conectarWiFi()
     tentativasWiFi++;
   }
 
-  debugInfo("");
+  debugInfoSemLinha("\n\r");
 
   if (WiFi.status() == WL_CONNECTED)
   {
     debugInfo("WiFi connectado com sucesso!");
-    debugInfo("Endereço IP: ");
-    debugInfo(String( WiFi.localIP() ) );
+    debugInfoSemLinha("Endereço IP: ");
+    debugInfoSemLinha(WiFi.localIP().toString() ) ;
+    debugInfoSemLinha("\n\r");
   }
 
   else
