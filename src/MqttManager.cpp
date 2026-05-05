@@ -81,7 +81,26 @@ void configurarMQTT()
     }
     else if (MQTT_USAR_TLS)
     {
-        // TODO: IMPLEMENTAR CONEXÃO COM CERTIFICADO
+        debugInfo("Modo selecionado: MQTT com TLS.");
+
+        if(strlen(MQTT_CERTIFICADO_CA) > 100)
+        {
+            debugInfo("Certificado CA do broker MQTT configurado.");
+            wifiClienteSecure.setCACert(MQTT_CERTIFICADO_CA);
+        }
+        else
+        {
+            debugErro("Certificado CA do MQTT não configurado. Usando setInsecure apenas para teste.");
+            wifiClienteSecure.setInsecure();
+        }
+
+        mqttClient.setClient(wifiClienteSecure);
+        mqttClient.setServer(MQTT_BROKER, MQTT_PORTA);
+
+        debugInfo("Broker MQTT: " + String(MQTT_BROKER));
+        debugInfo("Porta MQTT: " + String(MQTT_PORTA));
+
+
     }
     else // conectar no broker sem certificado
     {

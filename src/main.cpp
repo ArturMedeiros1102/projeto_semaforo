@@ -18,6 +18,9 @@ const int QUANTIDADE_LEDS = 1;
 
 const char TOPICO_COMANDO[] = "senai/Nicolas/esp32/comando";
 
+const int PINO_LAMPADA = 15;
+
+
 Adafruit_NeoPixel ledRGB(
     QUANTIDADE_LEDS,
     PINO_LED_RGB,
@@ -39,6 +42,7 @@ void setup()
   configurarMQTT();
   registrarCallbackMensagem(tratarMensagemRecebida);
   conectarMQTT();
+  pinMode(PINO_LAMPADA, OUTPUT);
 }
 
 void loop()
@@ -133,5 +137,14 @@ void tratarJsonComando(const String &mensagem)
 
       alterarCorLedRGB(vermelho, verde, azul); // Chama a função alterarCorLedRGB, passando os valores de vermelho, verde e azul extraídos do JSON para configurar a cor do Led RGB.
     }
+  }
+
+  if(doc["lampada"].is<bool>()) // Verifica se o campo "lampada" existe e é um valor booleano. Se não for, essa parte do código será ignorada.
+  {
+    bool estadoLampada = doc["lampada"].as<bool>(); // Extrai o valor booleano do campo "lampada" do objeto JSON e o armazena na variável estadoLampada. O método as<bool>() é usado para converter o valor JSON para um tipo booleano.
+
+    digitalWrite(PINO_LAMPADA, estadoLampada); // Configura o estado do pino da lâmpada com base no valor de estadoLampada. Se estadoLampada for true, a lâmpada será ligada (HIGH); se for false, a lâmpada será desligada (LOW).
+
+    debugInfo("Lâmpada: " + String(estadoLampada ? "ligada" : "desligada")); // Exibe no console de depuração se a lâmpada foi ligada ou desligada com base no valor de estadoLampada.
   }
 }
