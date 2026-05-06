@@ -132,6 +132,7 @@ void atualizarStatusLampada(bool ligada)
   lcd.setCursor(8, 0);
   lcd.print(ligada ? "ALTO" : "NORMAL");
   lcd.setCursor(0, 1);
+  lcd.print("Verde: %d, ");
 }
 
 void tratarJsonComando(const String &mensagem)
