@@ -1,10 +1,3 @@
-/*
-Autor: Nicolas Marcelino Lopes.
-Descrição: MQTT fundamentos.
-Data: 24/04/2026.
-Versão: 1.0.
-*/
-
 #include <LiquidCrystal_I2C.h>
 
 #include <Arduino.h>
@@ -75,6 +68,16 @@ void loop()
 
   agora = millis();
 
+  bool estadoAnterior = false;
+
+  bool ligada = digitalRead(PINO_LAMPADA);
+
+  if (ligada != estadoAnterior)
+  {
+    atualizarStatusLampada(ligada);
+    estadoAnterior = ligada;
+  }
+
   // alterarCorLedRGB(255, 0, 0);     // Exemplo: Configura o Led RGB para vermelho.
   // delay(1000);                     // Aguarda 1 segundo.
   // alterarCorLedRGB(0, 255, 0);     // Exemplo: Configura o Led RGB para verde.
@@ -141,8 +144,24 @@ void atualizarStatusLampada(bool ligada)
   lcd.print("Fluxo:");
   lcd.setCursor(8, 0);
   lcd.print(ligada ? "ALTO" : "NORMAL");
-  lcd.setCursor(0, 1);
-  lcd.print("Verde: %d, ");
+  if (ligada == true)
+  {
+    lcd.setCursor(0, 1);
+    lcd.printf("Verde: %d s", 7);
+    lcd.setCursor(0, 2);
+    lcd.printf("Amarelo: %d s", 3);
+    lcd.setCursor(0, 3);
+    lcd.printf("Vermelho: %d s", 5);
+  }
+  else
+  {
+    lcd.setCursor(0, 1);
+    lcd.printf("Verde: %d s", 3);
+    lcd.setCursor(0, 2);
+    lcd.printf("Amarelo: %d s", 2);
+    lcd.setCursor(0, 3);
+    lcd.printf("Vermelho: %d s", 5);
+  }
 }
 
 void tratarJsonComando(const String &mensagem)
