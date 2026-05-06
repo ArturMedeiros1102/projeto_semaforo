@@ -24,10 +24,10 @@ const int PINO_LAMPADA = 15;
 
 int tela = 1;
 
-unsigned long tempoAnterior = 0;
 unsigned long agora;
 
- bool estadoLampada;
+bool fluxoAlto = false;
+bool estadoLampada = false;
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 Adafruit_NeoPixel ledRGB(
@@ -45,6 +45,8 @@ void atualizarStatusLampada(bool ligada);
 void tratarLed(JsonDocument &doc);
 void tratarLampada(JsonDocument &doc);
 void tratarLcd(JsonDocument &doc);
+
+void atualizarSemaforo();
 
 void setup()
 {
@@ -160,36 +162,22 @@ void tratarJsonComando(const String &mensagem)
   tratarLcd(doc);
 }
 
+void atualizarSemaforo()
+{
+ unsigned long tempofaseLed = 0;
+ 
+ if
+
+}
+
+
 void tratarLed(JsonDocument &doc)
 {
-  if (!doc["led_verde"].is<JsonObject>())
+  if (fluxoAlto)
   {
-    debugErro("led_verde não é um objeto JSON");
-    return;
-  } // Verifica se o campo "led" existe e é um objeto JSON. Se não for, exibe uma mensagem de erro e retorna da função.
-
-  if (!doc["led"]["r"].is<int>() ||
-      !doc["led"]["g"].is<int>() ||
-      !doc["led"]["b"].is<int>()) // Verifica se os campos "r", "g" e "b" existem dentro do objeto "led". Se algum desses campos estiver faltando, exibe uma mensagem de erro e retorna da função.
-  {
-    debugErro("JSON INVÁLIDO. Use led.r, led.g e led.b para configurar a cor do Led RGB.");
-    return;
-  }
-  else
-  {
-    int vermelho = doc["led_verde"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
-    int verde = doc["led_verde"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
-    int azul = doc["led_verde"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
-
-    alterarCorLedRGB(vermelho, verde, azul); // Chama a função alterarCorLedRGB, passando os valores de vermelho, verde e azul extraídos do JSON para configurar a cor do Led RGB.
-  }
-
-  if (agora - tempoAnterior > 3000)
-  {
-
-    if (!doc["led_amarelo"].is<JsonObject>())
+    if (!doc["led_verde"].is<JsonObject>())
     {
-      debugErro("led_amarelo não é um objeto JSON");
+      debugErro("led_verde não é um objeto JSON");
       return;
     } // Verifica se o campo "led" existe e é um objeto JSON. Se não for, exibe uma mensagem de erro e retorna da função.
 
@@ -202,21 +190,83 @@ void tratarLed(JsonDocument &doc)
     }
     else
     {
-      int vermelho = doc["led_amarelo"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
-      int verde = doc["led_amarelo"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
-      int azul = doc["led_amarelo"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+      int vermelho = doc["led_verde"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+      int verde = doc["led_verde"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+      int azul = doc["led_verde"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
 
       alterarCorLedRGB(vermelho, verde, azul); // Chama a função alterarCorLedRGB, passando os valores de vermelho, verde e azul extraídos do JSON para configurar a cor do Led RGB.
     }
-    tempoAnterior = agora;
+
+    if (agora - tempoAnterior > 7000)
+    {
+
+      if (!doc["led_amarelo"].is<JsonObject>())
+      {
+        debugErro("led_amarelo não é um objeto JSON");
+        return;
+      } // Verifica se o campo "led" existe e é um objeto JSON. Se não for, exibe uma mensagem de erro e retorna da função.
+
+      if (!doc["led"]["r"].is<int>() ||
+          !doc["led"]["g"].is<int>() ||
+          !doc["led"]["b"].is<int>()) // Verifica se os campos "r", "g" e "b" existem dentro do objeto "led". Se algum desses campos estiver faltando, exibe uma mensagem de erro e retorna da função.
+      {
+        debugErro("JSON INVÁLIDO. Use led.r, led.g e led.b para configurar a cor do Led RGB.");
+        return;
+      }
+      else
+      {
+        int vermelho = doc["led_amarelo"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+        int verde = doc["led_amarelo"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+        int azul = doc["led_amarelo"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+
+        alterarCorLedRGB(vermelho, verde, azul); // Chama a função alterarCorLedRGB, passando os valores de vermelho, verde e azul extraídos do JSON para configurar a cor do Led RGB.
+      }
+      tempoAnterior = agora;
+    }
+
+    if (agora - tempoAnterior > 2000)
+    {
+
+      if (!doc["led_vermelho"].is<JsonObject>())
+      {
+        debugErro("led_vermelho não é um objeto JSON");
+        return;
+      } // Verifica se o campo "led" existe e é um objeto JSON. Se não for, exibe uma mensagem de erro e retorna da função.
+
+      if (!doc["led"]["r"].is<int>() ||
+          !doc["led"]["g"].is<int>() ||
+          !doc["led"]["b"].is<int>()) // Verifica se os campos "r", "g" e "b" existem dentro do objeto "led". Se algum desses campos estiver faltando, exibe uma mensagem de erro e retorna da função.
+      {
+        debugErro("JSON INVÁLIDO. Use led.r, led.g e led.b para configurar a cor do Led RGB.");
+        return;
+      }
+      else
+      {
+        int vermelho = doc["led_vermelho"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+        int verde = doc["led_vermelho"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+        int azul = doc["led_vermelho"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+
+        alterarCorLedRGB(vermelho, verde, azul); // Chama a função alterarCorLedRGB, passando os valores de vermelho, verde e azul extraídos do JSON para configurar a cor do Led RGB.
+      }
+      tempoAnterior = agora;
+    }
   }
 
-  if (agora - tempoAnterior > 2000)
+  if (agora - tempoAnterior > 5000)
   {
-
-    if (!doc["led_vermelho"].is<JsonObject>())
+    if (estadoLampada)
     {
-      debugErro("led_vermelho não é um objeto JSON");
+      fluxoAlto = true;
+      tempoAnterior = agora;
+    }
+    else
+      fluxoAlto = false;
+  }
+  else if (!fluxoAlto)
+  {
+    if (!doc["led_verde"].is<JsonObject>())
+    {
+      debugErro("led_verde não é um objeto JSON");
       return;
     } // Verifica se o campo "led" existe e é um objeto JSON. Se não for, exibe uma mensagem de erro e retorna da função.
 
@@ -229,37 +279,95 @@ void tratarLed(JsonDocument &doc)
     }
     else
     {
-      int vermelho = doc["led_vermelho"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
-      int verde = doc["led_vermelho"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
-      int azul = doc["led_vermelho"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+      int vermelho = doc["led_verde"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+      int verde = doc["led_verde"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+      int azul = doc["led_verde"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
 
       alterarCorLedRGB(vermelho, verde, azul); // Chama a função alterarCorLedRGB, passando os valores de vermelho, verde e azul extraídos do JSON para configurar a cor do Led RGB.
     }
-    tempoAnterior = agora;
-    
-  }
 
-  if(agora - tempoAnterior > 5000)
+    if (agora - tempoAnterior > 3000)
+    {
+
+      if (!doc["led_amarelo"].is<JsonObject>())
+      {
+        debugErro("led_amarelo não é um objeto JSON");
+        return;
+      } // Verifica se o campo "led" existe e é um objeto JSON. Se não for, exibe uma mensagem de erro e retorna da função.
+
+      if (!doc["led"]["r"].is<int>() ||
+          !doc["led"]["g"].is<int>() ||
+          !doc["led"]["b"].is<int>()) // Verifica se os campos "r", "g" e "b" existem dentro do objeto "led". Se algum desses campos estiver faltando, exibe uma mensagem de erro e retorna da função.
+      {
+        debugErro("JSON INVÁLIDO. Use led.r, led.g e led.b para configurar a cor do Led RGB.");
+        return;
+      }
+      else
+      {
+        int vermelho = doc["led_amarelo"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+        int verde = doc["led_amarelo"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+        int azul = doc["led_amarelo"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+
+        alterarCorLedRGB(vermelho, verde, azul); // Chama a função alterarCorLedRGB, passando os valores de vermelho, verde e azul extraídos do JSON para configurar a cor do Led RGB.
+      }
+      tempoAnterior = agora;
+    }
+
+    if (agora - tempoAnterior > 2000)
+    {
+
+      if (!doc["led_vermelho"].is<JsonObject>())
+      {
+        debugErro("led_vermelho não é um objeto JSON");
+        return;
+      } // Verifica se o campo "led" existe e é um objeto JSON. Se não for, exibe uma mensagem de erro e retorna da função.
+
+      if (!doc["led"]["r"].is<int>() ||
+          !doc["led"]["g"].is<int>() ||
+          !doc["led"]["b"].is<int>()) // Verifica se os campos "r", "g" e "b" existem dentro do objeto "led". Se algum desses campos estiver faltando, exibe uma mensagem de erro e retorna da função.
+      {
+        debugErro("JSON INVÁLIDO. Use led.r, led.g e led.b para configurar a cor do Led RGB.");
+        return;
+      }
+      else
+      {
+        int vermelho = doc["led_vermelho"]["r"].as<int>(); // Extrai o valor do componente vermelho do objeto JSON e o armazena na variável vermelho. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+        int verde = doc["led_vermelho"]["g"].as<int>();    // Extrai o valor do componente verde do objeto JSON e o armazena na variável verde. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+        int azul = doc["led_vermelho"]["b"].as<int>();     // Extrai o valor do componente azul do objeto JSON e o armazena na variável azul. O método as<int>() é usado para converter o valor JSON para um tipo inteiro.
+
+        alterarCorLedRGB(vermelho, verde, azul); // Chama a função alterarCorLedRGB, passando os valores de vermelho, verde e azul extraídos do JSON para configurar a cor do Led RGB.
+      }
+      tempoAnterior = agora;
+    }
+  }
+  if (agora - tempoAnterior > 5000)
   {
-   if(estadoLampada)
-
+    if (estadoLampada)
+    {
+      fluxoAlto = true;
+      tempoAnterior = agora;
+    }
+    else
+    {
+      fluxoAlto = false;
+      tempoAnterior = agora;
+    }
   }
-}
-
-void tratarLampada(JsonDocument &doc)
-{
-  if (doc["lampada"].is<bool>()) // Verifica se o campo "lampada" existe e é um valor booleano. Se não for, essa parte do código será ignorada.
+} 
+  void tratarLampada(JsonDocument & doc)
   {
-    bool estadoLampada = doc["lampada"].as<bool>(); // Extrai o valor booleano do campo "lampada" do objeto JSON e o armazena na variável estadoLampada. O método as<bool>() é usado para converter o valor JSON para um tipo booleano.
+    if (doc["lampada"].is<bool>()) // Verifica se o campo "lampada" existe e é um valor booleano. Se não for, essa parte do código será ignorada.
+    {
+      estadoLampada = doc["lampada"].as<bool>(); // Extrai o valor booleano do campo "lampada" do objeto JSON e o armazena na variável estadoLampada. O método as<bool>() é usado para converter o valor JSON para um tipo booleano.
 
-    digitalWrite(PINO_LAMPADA, estadoLampada); // Configura o estado do pino da lâmpada com base no valor de estadoLampada. Se estadoLampada for true, a lâmpada será ligada (HIGH); se for false, a lâmpada será desligada (LOW).
+      digitalWrite(PINO_LAMPADA, estadoLampada); // Configura o estado do pino da lâmpada com base no valor de estadoLampada. Se estadoLampada for true, a lâmpada será ligada (HIGH); se for false, a lâmpada será desligada (LOW).
 
-    atualizarStatusLampada(estadoLampada); // Atualiza o display LCD com o status da lâmpada
+      atualizarStatusLampada(estadoLampada); // Atualiza o display LCD com o status da lâmpada
 
-    debugInfo("Lâmpada: " + String(estadoLampada ? "ligada" : "desligada")); // Exibe no console de depuração se a lâmpada foi ligada ou desligada com base no valor de estadoLampada.
+      debugInfo("Lâmpada: " + String(estadoLampada ? "ligada" : "desligada")); // Exibe no console de depuração se a lâmpada foi ligada ou desligada com base no valor de estadoLampada.
+    }
   }
-}
 
-void tratarLcd(JsonDocument &doc)
-{
-}
+  void tratarLcd(JsonDocument & doc)
+  {
+  }
