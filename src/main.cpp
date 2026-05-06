@@ -23,6 +23,8 @@ const char TOPICO_COMANDO[] = "senai/Nicolas/esp32/comando";
 
 const int PINO_LAMPADA = 15;
 
+int tela = 1;
+
 
 Adafruit_NeoPixel ledRGB(
     QUANTIDADE_LEDS,
@@ -34,12 +36,21 @@ void tratarMensagemRecebida(const char *topico, const String &mensagem);
 void configurarLedRGB();
 void alterarCorLedRGB(int vermelho, int verde, int azul);
 void tratarJsonComando(const String &mensagem);
+void atualizarStatusLampada(bool ligada);
 
 void setup()
 {
   configurarDebug();
 
   configurarLedRGB(); // TODO: Explicar na próxima aula
+
+  // Inicializar LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Sistema Iniciado");
+  delay(2000);
+  lcd.clear();
 
   conectarWiFi();
   configurarMQTT();
@@ -113,6 +124,16 @@ void alterarCorLedRGB(int vermelho, int verde, int azul)
   debugInfo("B: " + String(azul));     // Exibe o valor do componente azul no console de depuração.
 }
 
+void atualizarStatusLampada(bool ligada)
+{
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Fluxo:");
+  lcd.setCursor(8, 0);
+  lcd.print(ligada ? "ALTO" : "NORMAL");
+  lcd.setCursor(0, 1);
+}
+
 void tratarJsonComando(const String &mensagem)
 {
   JsonDocument doc;
@@ -147,6 +168,8 @@ void tratarJsonComando(const String &mensagem)
     bool estadoLampada = doc["lampada"].as<bool>(); // Extrai o valor booleano do campo "lampada" do objeto JSON e o armazena na variável estadoLampada. O método as<bool>() é usado para converter o valor JSON para um tipo booleano.
 
     digitalWrite(PINO_LAMPADA, estadoLampada); // Configura o estado do pino da lâmpada com base no valor de estadoLampada. Se estadoLampada for true, a lâmpada será ligada (HIGH); se for false, a lâmpada será desligada (LOW).
+
+    atualizarStatusLampada(estadoLampada); // Atualiza o display LCD com o status da lâmpada
 
     debugInfo("Lâmpada: " + String(estadoLampada ? "ligada" : "desligada")); // Exibe no console de depuração se a lâmpada foi ligada ou desligada com base no valor de estadoLampada.
   }
