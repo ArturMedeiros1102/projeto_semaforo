@@ -71,12 +71,11 @@ void loop()
 
   bool estadoAnterior = false;
 
-  bool ligada = digitalRead(PINO_LAMPADA);
-
-  if (ligada != estadoAnterior)
+  if (estadoLampada != estadoAnterior)
   {
-    atualizarStatusLampada(ligada);
-    estadoAnterior = ligada;
+    fluxoAlto = estadoLampada;
+    atualizarStatusLampada(estadoLampada);
+    estadoAnterior = estadoLampada;
   }
 
   // alterarCorLedRGB(255, 0, 0);     // Exemplo: Configura o Led RGB para vermelho.
@@ -150,7 +149,7 @@ void atualizarStatusLampada(bool ligada)
     lcd.setCursor(0, 1);
     lcd.printf("Verde: %d s", 7);
     lcd.setCursor(0, 2);
-    lcd.printf("Amarelo: %d s", 3);
+    lcd.printf("Amarelo: %d s", 2);
     lcd.setCursor(0, 3);
     lcd.printf("Vermelho: %d s", 5);
   }
