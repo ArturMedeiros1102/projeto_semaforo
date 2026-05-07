@@ -1,5 +1,4 @@
 #include <LiquidCrystal_I2C.h>
-
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Adafruit_NeoPixel.h>
@@ -10,16 +9,19 @@
 
 const int PINO_LED_RGB = 48;
 const int QUANTIDADE_LEDS = 1;
-
 const char TOPICO_COMANDO[] = "senai/Nicolas/esp32/comando";
-
 const int PINO_LAMPADA = 15;
 
-int tela = 1;
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+Adafruit_NeoPixel ledRGB(
+    QUANTIDADE_LEDS,
+    PINO_LED_RGB,
+    NEO_GRB + NEO_KHZ800);
 
 unsigned long agora;
-bool fluxoAlto = false;
 unsigned long tempoAnterior = 0;
+
+bool fluxoAlto = false;
 int faseSemaforo = 0;
 
 int corVerde[3] = {0, 255, 0};
@@ -27,35 +29,22 @@ int corAmarelo[3] = {255, 255, 0};
 int corVermelho[3] = {255, 0, 0};
 
 bool estadoLampada = false;
-
 bool estadoAnterior = false;
-
-LiquidCrystal_I2C lcd(0x27, 20, 4);
-Adafruit_NeoPixel ledRGB(
-    QUANTIDADE_LEDS,
-    PINO_LED_RGB,
-    NEO_GRB + NEO_KHZ800 // Constante de configuração.
-);
 
 void tratarMensagemRecebida(const char *topico, const String &mensagem);
 void configurarLedRGB();
 void alterarCorLedRGB(int vermelho, int verde, int azul);
 void tratarJsonComando(const String &mensagem);
 void atualizarStatusLampada(bool ligada);
-
 void tratarLed(JsonDocument &doc);
 void tratarLampada(JsonDocument &doc);
-void tratarLcd(JsonDocument &doc);
-
 void atualizarSemaforo();
 
 void setup()
 {
   configurarDebug();
-
   configurarLedRGB(); // TODO: Explicar na próxima aula
 
-  // Inicializar LCD
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
@@ -81,21 +70,9 @@ void loop()
   if (estadoLampada != estadoAnterior)
   {
     fluxoAlto = estadoLampada;
-    atualizarStatusLampada(estadoLampada);
     estadoAnterior = estadoLampada;
-    faseSemaforo = 0;
-    tempoAnterior = agora;
   }
   atualizarSemaforo();
-
-  // alterarCorLedRGB(255, 0, 0);     // Exemplo: Configura o Led RGB para vermelho.
-  // delay(1000);                     // Aguarda 1 segundo.
-  // alterarCorLedRGB(0, 255, 0);     // Exemplo: Configura o Led RGB para verde.
-  // delay(1000);                     // Aguarda 1 segundo.
-  // alterarCorLedRGB(0, 0, 255);     // Exemplo: Configura o Led RGB para azul.
-  // delay(1000);                     // Aguarda 1 segundo.
-  // alterarCorLedRGB(255, 255, 255); // Exemplo: Configura o Led RGB para branco.
-  // delay(1000);                     // Aguarda 1 segundo.
 }
 
 void tratarMensagemRecebida(const char *topico, const String &mensagem)
@@ -209,12 +186,12 @@ void atualizarSemaforo()
     faseSemaforo = (faseSemaforo + 1) % 3;
   }
 
-    if (faseSemaforo == 0)
-      alterarCorLedRGB(corVerde[0], corVerde[1], corVerde[2]);
-    else if (faseSemaforo == 1)
-      alterarCorLedRGB(corAmarelo[0], corAmarelo[1], corAmarelo[2]);
-    else
-      alterarCorLedRGB(corVermelho[0], corVermelho[1], corVermelho[2]);
+  if (faseSemaforo == 0)
+    alterarCorLedRGB(corVerde[0], corVerde[1], corVerde[2]);
+  else if (faseSemaforo == 1)
+    alterarCorLedRGB(corAmarelo[0], corAmarelo[1], corAmarelo[2]);
+  else
+    alterarCorLedRGB(corVermelho[0], corVermelho[1], corVermelho[2]);
 }
 
 void tratarLed(JsonDocument &doc)
@@ -227,7 +204,7 @@ void tratarLed(JsonDocument &doc)
 
   if (!doc["led_verde"]["r"].is<int>() ||
       !doc["led_verde"]["g"].is<int>() ||
-      !doc["led_verde"]["b"].is<int>()) // [CORRIGIDO] Verificação agora bate com o campo que está sendo lido
+      !doc["led_verde"]["b"].is<int>())
   {
     debugErro("JSON INVÁLIDO. Use led_verde.r, led_verde.g e led_verde.b para configurar a cor verde.");
     return;
@@ -248,7 +225,7 @@ void tratarLed(JsonDocument &doc)
 
   if (!doc["led_amarelo"]["r"].is<int>() ||
       !doc["led_amarelo"]["g"].is<int>() ||
-      !doc["led_amarelo"]["b"].is<int>()) // [CORRIGIDO] Verificação agora bate com o campo que está sendo lido
+      !doc["led_amarelo"]["b"].is<int>())
   {
     debugErro("JSON INVÁLIDO. Use led_amarelo.r, led_amarelo.g e led_amarelo.b para configurar a cor amarelo.");
     return;
@@ -269,7 +246,7 @@ void tratarLed(JsonDocument &doc)
 
   if (!doc["led_vermelho"]["r"].is<int>() ||
       !doc["led_vermelho"]["g"].is<int>() ||
-      !doc["led_vermelho"]["b"].is<int>()) // [CORRIGIDO] Verificação agora bate com o campo que está sendo lido
+      !doc["led_vermelho"]["b"].is<int>())
   {
     debugErro("JSON INVÁLIDO. Use led_vermelho.r, led_vermelho.g e led_vermelho.b para configurar a cor vermelho.");
     return;
@@ -284,14 +261,11 @@ void tratarLed(JsonDocument &doc)
 }
 void tratarLampada(JsonDocument &doc)
 {
-  if (doc["lampada"].is<bool>()) // Verifica se o campo "lampada" existe e é um valor booleano. Se não for, essa parte do código será ignorada.
+  if (doc["lampada"].is<bool>())
   {
-    estadoLampada = doc["lampada"].as<bool>(); // Extrai o valor booleano do campo "lampada" do objeto JSON e o armazena na variável estadoLampada. O método as<bool>() é usado para converter o valor JSON para um tipo booleano.
-
-    digitalWrite(PINO_LAMPADA, estadoLampada); // Configura o estado do pino da lâmpada com base no valor de estadoLampada. Se estadoLampada for true, a lâmpada será ligada (HIGH); se for false, a lâmpada será desligada (LOW).
-
-    atualizarStatusLampada(estadoLampada); // Atualiza o display LCD com o status da lâmpada
-
-    debugInfo("Lâmpada: " + String(estadoLampada ? "ligada" : "desligada")); // Exibe no console de depuração se a lâmpada foi ligada ou desligada com base no valor de estadoLampada.
+    estadoLampada = doc["lampada"].as<bool>();
+    digitalWrite(PINO_LAMPADA, estadoLampada);
+    atualizarStatusLampada(estadoLampada);
+    debugInfo("Lâmpada: " + String(estadoLampada ? "ligada" : "desligada"));
   }
 }
