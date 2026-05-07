@@ -57,6 +57,8 @@ void setup()
   registrarCallbackMensagem(tratarMensagemRecebida);
   conectarMQTT();
   pinMode(PINO_LAMPADA, OUTPUT);
+
+  alterarCorLedRGB(corVerde[0], corVerde[1], corVerde[2]);
 }
 
 void loop()
@@ -184,14 +186,14 @@ void atualizarSemaforo()
   {
     tempoAnterior = agora;
     faseSemaforo = (faseSemaforo + 1) % 3;
-  }
 
-  if (faseSemaforo == 0)
-    alterarCorLedRGB(corVerde[0], corVerde[1], corVerde[2]);
-  else if (faseSemaforo == 1)
-    alterarCorLedRGB(corAmarelo[0], corAmarelo[1], corAmarelo[2]);
-  else
-    alterarCorLedRGB(corVermelho[0], corVermelho[1], corVermelho[2]);
+    if (faseSemaforo == 0)
+      alterarCorLedRGB(corVerde[0], corVerde[1], corVerde[2]);
+    else if (faseSemaforo == 1)
+      alterarCorLedRGB(corAmarelo[0], corAmarelo[1], corAmarelo[2]);
+    else
+      alterarCorLedRGB(corVermelho[0], corVermelho[1], corVermelho[2]);
+  }
 }
 
 void tratarLed(JsonDocument &doc)
