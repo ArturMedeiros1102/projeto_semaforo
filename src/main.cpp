@@ -28,6 +28,8 @@ int corVermelho[3] = {255, 0, 0};
 
 bool estadoLampada = false;
 
+bool estadoAnterior = false;
+
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 Adafruit_NeoPixel ledRGB(
     QUANTIDADE_LEDS,
@@ -73,18 +75,18 @@ void loop()
   garantirWiFiConectado();
   garantirMQTTConectado();
   loopMQTT();
-  atualizarSemaforo();
 
   agora = millis();
-
-  bool estadoAnterior = false;
 
   if (estadoLampada != estadoAnterior)
   {
     fluxoAlto = estadoLampada;
     atualizarStatusLampada(estadoLampada);
     estadoAnterior = estadoLampada;
+    faseSemaforo = 0;
+    tempoAnterior = agora;
   }
+  atualizarSemaforo();
 
   // alterarCorLedRGB(255, 0, 0);     // Exemplo: Configura o Led RGB para vermelho.
   // delay(1000);                     // Aguarda 1 segundo.
@@ -184,7 +186,6 @@ void tratarJsonComando(const String &mensagem)
 
   tratarLed(doc);
   tratarLampada(doc);
-  tratarLcd(doc);
 }
 
 void atualizarSemaforo()
@@ -206,6 +207,7 @@ void atualizarSemaforo()
   {
     tempoAnterior = agora;
     faseSemaforo = (faseSemaforo + 1) % 3;
+  }
 
     if (faseSemaforo == 0)
       alterarCorLedRGB(corVerde[0], corVerde[1], corVerde[2]);
@@ -213,7 +215,6 @@ void atualizarSemaforo()
       alterarCorLedRGB(corAmarelo[0], corAmarelo[1], corAmarelo[2]);
     else
       alterarCorLedRGB(corVermelho[0], corVermelho[1], corVermelho[2]);
-  }
 }
 
 void tratarLed(JsonDocument &doc)
@@ -293,8 +294,4 @@ void tratarLampada(JsonDocument &doc)
 
     debugInfo("Lâmpada: " + String(estadoLampada ? "ligada" : "desligada")); // Exibe no console de depuração se a lâmpada foi ligada ou desligada com base no valor de estadoLampada.
   }
-}
-
-void tratarLcd(JsonDocument &doc)
-{
 }
