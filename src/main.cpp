@@ -136,20 +136,20 @@ void atualizarStatusLampada(bool ligada)
   if (ligada == true)
   {
     lcd.setCursor(0, 1);
-    lcd.printf("Verde: %d s", 7);
+    lcd.printf("Verde: %ds", 7);
     lcd.setCursor(0, 2);
-    lcd.printf("Amarelo: %d s", 2);
+    lcd.printf("Amarelo: %ds", 2);
     lcd.setCursor(0, 3);
-    lcd.printf("Vermelho: %d s", 5);
+    lcd.printf("Vermelho: %ds", 5);
   }
   else
   {
     lcd.setCursor(0, 1);
-    lcd.printf("Verde: %d s", 3);
+    lcd.printf("Verde: %ds", 3);
     lcd.setCursor(0, 2);
-    lcd.printf("Amarelo: %d s", 2);
+    lcd.printf("Amarelo: %ds", 2);
     lcd.setCursor(0, 3);
-    lcd.printf("Vermelho: %d s", 5);
+    lcd.printf("Vermelho: %ds", 5);
   }
 }
 
