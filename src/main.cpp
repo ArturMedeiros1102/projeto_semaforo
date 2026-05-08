@@ -206,7 +206,7 @@ void atualizarNoturno()
 {
   const unsigned long INTERVALO_PISCAR = 500;
 
-  if (agora - tempoAnterior >= INTERVALO_PISCAR)
+  if (agora - tempoNoturno >= INTERVALO_PISCAR)
   {
     tempoNoturno = agora;
     estadoLedNoturno = !estadoLedNoturno;
