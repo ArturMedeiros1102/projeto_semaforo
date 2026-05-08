@@ -29,9 +29,9 @@ void registrarCallbackMensagem(CallbackMensagemMQTT callback)
 
 const char *obterTopicoPublicacao(int indiceTopico)
 {
+    if (indiceTopico < 0 || indiceTopico >= TOTAL_TOPICOS_PUBLICAR)
     {
-        if (indiceTopico < 0 || indiceTopico >= TOTAL_TOPICOS_PUBLICAR)
-            debugErro("Indice inválido para tópico de publicação: " + String(indiceTopico));
+        debugErro("Indice inválido para tópico de publicação: " + String(indiceTopico));
         return "";
     }
 
