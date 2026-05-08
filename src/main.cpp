@@ -238,7 +238,7 @@ void tratarLed(JsonDocument &doc)
   if(doc["led_amarelo"].is<JsonObject>() &&
       doc["led_amarelo"]["r"].is<int>() &&
       doc["led_amarelo"]["g"].is<int>() &&
-      doc["led_amrelo"]["b"].is<int>())
+      doc["led_amarelo"]["b"].is<int>())
     {
      corAmarelo[0] = doc["led_amarelo"]["r"].as<int>();
      corAmarelo[1] = doc["led_amarelo"]["g"].as<int>();
