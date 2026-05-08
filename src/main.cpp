@@ -152,9 +152,9 @@ void atualizarStatusLcd()
   lcd.setCursor(0, 1);
   lcd.print("Verde: " + String(tVerde) + "s");
   lcd.setCursor(0, 2);
-  lcd.print("Verde: " + String(tAmarelo) + "s");
+  lcd.print("Amarelo: " + String(tAmarelo) + "s");
   lcd.setCursor(0, 3);
-  lcd.print("Verde: " + String(tVermelho) + "s");
+  lcd.print("Vermelho: " + String(tVermelho) + "s");
 }
 
 void tratarJsonComando(const String &mensagem)
